@@ -2,52 +2,114 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recepcion - DentalSys</title>
+    <title>Recepción - Consultorio Dental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { min-height: 100vh; background-color: #1e3a34; color: white; width: 260px; }
+        :root { --primary-green: #1e3a34; --action-green: #2ecc71; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { min-height: 100vh; background-color: var(--primary-green); color: white; width: 260px; }
         .sidebar a { color: #d1e7dd; text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 5px 10px; cursor: pointer; }
-        .sidebar a:hover, .sidebar a.active { background-color: #14a44d; color: white; }
+        .sidebar a:hover, .sidebar a.active { background-color: var(--action-green); color: white; }
     </style>
 </head>
 <body>
     <div class="d-flex">
         <nav class="sidebar shadow p-3">
-            <h4 class="text-center mb-4"><i class="fas fa-concierge-bell"></i> Recepción</h4>
-            <a class="active"><i class="fas fa-tasks me-2"></i> Citas de Hoy</a>
-            <a onclick="alert('Módulo de pagos habilitado')"><i class="fas fa-wallet me-2"></i> Cobros y Caja</a>
+            <h4 class="text-center mt-3"><i class="fas fa-concierge-bell"></i> Recepción</h4>
+            <a onclick="cambiarModulo('agenda', this)" class="active"><i class="fas fa-calendar-alt me-2"></i> Agenda del Día</a>
+            <a onclick="cambiarModulo('cobros', this)"><i class="fas fa-wallet me-2"></i> Cobros y Caja</a>
             <a href="login_dentista.html" class="text-white bg-danger mt-5"><i class="fas fa-door-open"></i> Salir</a>
         </nav>
 
         <div class="flex-grow-1 p-4">
-            <h2 class="fw-bold text-success">Control de Recepción</h2>
-            <div class="card shadow p-4 mt-3">
-                <div class="d-flex justify-content-between mb-3">
-                    <h5>Pacientes en espera de revisión</h5>
-                    <button class="btn btn-success" onclick="alert('Abriendo formulario de admisión...')">+ Registrar Entrada</button>
+            <h2 class="fw-bold text-success mb-4" id="titulo-asistente">Agenda de Recepción</h2>
+
+            <div id="modulo-agenda" class="seccion-modulo d-block">
+                <div class="card p-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Admisión de Pacientes</h5>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAsistente">+ Registrar Paciente</button>
+                    </div>
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Motivo</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-asistente">
+                            <tr>
+                                <td>Lucía Fernández</td>
+                                <td>Revisión</td>
+                                <td><span class="badge bg-secondary">Enviado a Dra.</span></td>
+                                <td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Hora</th>
-                            <th>Paciente</th>
-                            <th>Doctor Asignado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>08:30</td>
-                            <td>Carlos Mendoza</td>
-                            <td>Dra. Rojas</td>
-                            <td><button class="btn btn-sm btn-info text-white">Notificar Doctora</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+            </div>
+
+            <div id="modulo-cobros" class="seccion-modulo d-none">
+                <div class="card p-5 text-center border-0 shadow-sm">
+                    <i class="fas fa-money-bill-wave fa-4x text-success mb-3"></i>
+                    <h4>Módulo de Cobros habilitado</h4>
+                    <p>Aquí se gestionan los pagos de las extracciones y limpiezas.</p>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalAsistente" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Admisión de Paciente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAsist">
+                        <div class="mb-3"><label>Nombre Completo</label><input type="text" id="asis-nom" class="form-control"></div>
+                        <div class="mb-3">
+                            <label>Motivo</label>
+                            <select id="asis-mot" class="form-select">
+                                <option>Revisión</option>
+                                <option>Limpieza</option>
+                                <option>Extracción</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success w-100" onclick="enviarADra()">Enviar a Consultorio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function cambiarModulo(id, el) {
+            document.querySelectorAll('.seccion-modulo').forEach(s => {
+                s.classList.remove('d-block'); s.classList.add('d-none');
+            });
+            document.getElementById('modulo-'+id).classList.remove('d-none');
+            document.getElementById('modulo-'+id).classList.add('d-block');
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function enviarADra() {
+            let nom = document.getElementById('asis-nom').value;
+            let mot = document.getElementById('asis-mot').value;
+            if(nom === "") return;
+            let fila = `<tr><td>${nom}</td><td>${mot}</td><td><span class="badge bg-secondary">Enviado a Dra.</span></td><td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td></tr>`;
+            document.getElementById('tabla-asistente').innerHTML += fila;
+            bootstrap.Modal.getInstance(document.getElementById('modalAsistente')).hide();
+            document.getElementById('formAsist').reset();
+        }
+    </script>
 </body>
 </html>

@@ -2,15 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Médico Senior - Dra. Rojas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Médico Senior - Dra. Rojas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary-dark: #0f4c75; --secondary-blue: #3282b8; --accent-cyan: #bbe1fa; }
         body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
         .sidebar { min-height: 100vh; background-color: var(--primary-dark); color: white; width: 280px; }
-        .sidebar a { color: var(--accent-cyan); text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 5px 10px; cursor: pointer; }
-        .sidebar a.active { background-color: var(--secondary-blue); color: white; }
+        .sidebar h4 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        .sidebar a { color: var(--accent-cyan); text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 5px 10px; cursor: pointer; transition: 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background-color: var(--secondary-blue); color: white; transform: translateX(5px); }
+        .card-stats { border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary-blue); }
         .seccion-modulo { display: none; }
         .seccion-activa { display: block; }
     </style>
@@ -18,26 +21,44 @@
 <body>
     <div class="d-flex">
         <nav class="sidebar shadow p-3">
-            <h4 class="text-center mb-4"><i class="fas fa-user-md"></i> Portal Médico</h4>
-            <a onclick="cambiarModulo('citas', this)" class="active"><i class="fas fa-calendar-check me-2"></i> Gestión de Pacientes</a>
-            <a onclick="cambiarModulo('horarios', this)"><i class="fas fa-clock me-2"></i> Mis Horarios</a>
-            <a href="login_dentista.html" class="text-white bg-danger mt-5"><i class="fas fa-sign-out-alt"></i> Salir</a>
+            <h4 class="text-center mt-3"><i class="fas fa-user-md"></i> Portal Médico</h4>
+            <a onclick="cambiarModulo('resumen', this)" class="active"><i class="fas fa-home me-2"></i> Resumen General</a>
+            <a onclick="cambiarModulo('pacientes', this)"><i class="fas fa-calendar-check me-2"></i> Gestión de Pacientes <span class="badge bg-danger rounded-pill float-end">3</span></a>
+            <a onclick="cambiarModulo('horarios', this)"><i class="fas fa-clock me-2"></i> Definir Mi Horario</a>
+            <a onclick="alert('Accediendo a Historias...')"><i class="fas fa-file-medical me-2"></i> Historias Clínicas</a>
+            <a onclick="alert('Cargando Odontograma...')"><i class="fas fa-tooth me-2"></i> Odontogramas Pro</a>
+            <a onclick="alert('Generando Reportes...')"><i class="fas fa-chart-line me-2"></i> Reportes de Producción</a>
+            <a onclick="alert('Configuración...')"><i class="fas fa-cog me-2"></i> Configuración</a>
+            <div class="mt-5 p-2">
+                <a href="login_dentista.html" class="text-white bg-danger text-center"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </div>
         </nav>
 
         <div class="flex-grow-1 p-4">
-            <h2 id="titulo-pantalla" class="fw-bold text-primary">Gestión de Pacientes</h2>
-            
-            <div id="modulo-citas" class="seccion-modulo seccion-activa">
-                <div class="card shadow border-0 p-4">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5>Base de Datos de Pacientes</h5>
-                        <button class="btn btn-primary btn-sm" onclick="abrirModalNuevo()">+ Nuevo Paciente</button>
-                    </div>
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-primary" id="titulo-pantalla">Resumen General</h2>
+                <button class="btn btn-primary" onclick="abrirModalNuevo()"><i class="fas fa-plus"></i> Nuevo Registro</button>
+            </header>
+
+            <div id="modulo-resumen" class="seccion-modulo seccion-activa">
+                <div class="row g-3">
+                    <div class="col-md-4"><div class="card p-3 bg-white shadow-sm border-0"><h6>Citas Hoy</h6><h3>12</h3></div></div>
+                    <div class="col-md-4"><div class="card p-3 bg-white shadow-sm border-0"><h6>Pendientes</h6><h3 class="text-warning">3</h3></div></div>
+                    <div class="col-md-4"><div class="card p-3 bg-white shadow-sm border-0"><h6>Atendidos</h6><h3 class="text-success">9</h3></div></div>
+                </div>
+                <div class="card mt-4 p-4 border-0 shadow-sm">
+                    <h5><i class="fas fa-info-circle"></i> Estado del Consultorio</h5>
+                    <p>Todos los sistemas están operativos. El asistente ha enviado 3 nuevas solicitudes.</p>
+                </div>
+            </div>
+
+            <div id="modulo-pacientes" class="seccion-modulo">
+                <div class="card card-stats p-4 bg-white border-0 shadow">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>CI</th>
-                                <th>Nombre</th>
+                                <th>Nombre / Correo</th>
                                 <th>Motivo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
@@ -45,12 +66,13 @@
                         </thead>
                         <tbody id="tabla-pacientes">
                             <tr id="fila-1">
-                                <td>1029384</td>
-                                <td><strong>Marcos Benítez</strong></td>
-                                <td><span class="badge bg-info text-dark">Limpieza</span></td>
-                                <td><span class="badge bg-warning">Pendiente</span></td>
+                                <td>1029384-LP</td>
+                                <td><strong>Marcos Benítez</strong><br><small>marcos@email.com</small></td>
+                                <td><span class="badge bg-info text-dark">Limpieza Dental</span></td>
+                                <td><span class="badge bg-warning">En Espera</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="editarPaciente(1, '1029384', 'Marcos Benítez', 'Limpieza')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('1', '1029384-LP', 'Marcos Benítez', 'marcos@email.com', 'Limpieza Dental')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="atender(this)"><i class="fas fa-check"></i></button>
                                     <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
@@ -60,10 +82,10 @@
             </div>
 
             <div id="modulo-horarios" class="seccion-modulo">
-                <div class="card p-5 text-center shadow">
-                    <i class="fas fa-calendar-alt fa-4x text-primary mb-3"></i>
-                    <h4>Configuración de Turnos Habilitada</h4>
-                    <p>Dra. Rojas, sus horarios están sincronizados con la recepción.</p>
+                <div class="card p-5 text-center shadow-sm border-0">
+                    <i class="fas fa-clock fa-4x text-primary mb-3"></i>
+                    <h4>Definición de Horarios</h4>
+                    <p>Seleccione sus turnos disponibles para que el asistente pueda agendar.</p>
                 </div>
             </div>
         </div>
@@ -79,13 +101,14 @@
                 <div class="modal-body">
                     <form id="formDoc">
                         <input type="hidden" id="edit-id">
-                        <div class="mb-3"><label>CI</label><input type="text" id="ci" class="form-control"></div>
-                        <div class="mb-3"><label>Nombre</label><input type="text" id="nombre" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label">Cédula (CI)</label><input type="text" id="reg-ci" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label">Nombre Completo</label><input type="text" id="reg-nombre" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label">Correo</label><input type="email" id="reg-correo" class="form-control"></div>
                         <div class="mb-3">
-                            <label>Motivo</label>
-                            <select id="motivo" class="form-select">
-                                <option>Revisión</option>
-                                <option>Limpieza</option>
+                            <label class="form-label">Motivo de la Cita</label>
+                            <select id="reg-motivo" class="form-select">
+                                <option>Revisión General</option>
+                                <option>Limpieza Dental</option>
                                 <option>Extracción</option>
                                 <option>Lavación Profunda</option>
                             </select>
@@ -93,7 +116,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" onclick="guardarCambiosDoc()">Guardar Paciente</button>
+                    <button class="btn btn-primary w-100" onclick="guardarPaciente()">Guardar Cambios</button>
                 </div>
             </div>
         </div>
@@ -106,39 +129,47 @@
             document.getElementById('modulo-'+id).classList.add('seccion-activa');
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             el.classList.add('active');
+            document.getElementById('titulo-pantalla').innerText = el.innerText;
         }
 
         function abrirModalNuevo() {
             document.getElementById('formDoc').reset();
-            document.getElementById('modalTitulo').innerText = "Nuevo Paciente";
             document.getElementById('edit-id').value = "";
+            document.getElementById('modalTitulo').innerText = "Nuevo Registro";
             new bootstrap.Modal(document.getElementById('modalPaciente')).show();
         }
 
-        function editarPaciente(id, ci, nom, mot) {
-            document.getElementById('modalTitulo').innerText = "Editar Paciente";
+        function editarPaciente(id, ci, nom, mail, mot) {
             document.getElementById('edit-id').value = id;
-            document.getElementById('ci').value = ci;
-            document.getElementById('nombre').value = nom;
-            document.getElementById('motivo').value = mot;
+            document.getElementById('reg-ci').value = ci;
+            document.getElementById('reg-nombre').value = nom;
+            document.getElementById('reg-correo').value = mail;
+            document.getElementById('reg-motivo').value = mot;
+            document.getElementById('modalTitulo').innerText = "Modificar Paciente";
             new bootstrap.Modal(document.getElementById('modalPaciente')).show();
         }
 
-        function guardarCambiosDoc() {
-            let id = document.getElementById('edit-id').value;
-            let ci = document.getElementById('ci').value;
-            let nom = document.getElementById('nombre').value;
-            let mot = document.getElementById('motivo').value;
+        function atender(btn) {
+            btn.closest('tr').querySelector('.badge.bg-warning').className = "badge bg-success";
+            btn.closest('tr').querySelector('.badge.bg-success').innerText = "Atendido";
+        }
 
-            if(id === "") { // Nuevo
+        function guardarPaciente() {
+            let id = document.getElementById('edit-id').value;
+            let ci = document.getElementById('reg-ci').value;
+            let nom = document.getElementById('reg-nombre').value;
+            let mail = document.getElementById('reg-correo').value;
+            let mot = document.getElementById('reg-motivo').value;
+
+            if(id === "") { // NUEVO
                 let newId = Date.now();
-                let fila = `<tr id="fila-${newId}"><td>${ci}</td><td><strong>${nom}</strong></td><td><span class="badge bg-info text-dark">${mot}</span></td><td><span class="badge bg-success">Nuevo</span></td><td><button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('${newId}', '${ci}', '${nom}', '${mot}')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td></tr>`;
+                let fila = `<tr id="fila-${newId}"><td>${ci}</td><td><strong>${nom}</strong><br><small>${mail}</small></td><td><span class="badge bg-info text-dark">${mot}</span></td><td><span class="badge bg-warning">Espera</span></td><td><button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('${newId}','${ci}','${nom}','${mail}','${mot}')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td></tr>`;
                 document.getElementById('tabla-pacientes').innerHTML += fila;
-            } else { // Editar
-                let fila = document.getElementById('fila-'+id);
-                fila.cells[0].innerText = ci;
-                fila.cells[1].innerHTML = `<strong>${nom}</strong>`;
-                fila.cells[2].innerHTML = `<span class="badge bg-info text-dark">${mot}</span>`;
+            } else { // EDITAR
+                let tr = document.getElementById('fila-'+id);
+                tr.cells[0].innerText = ci;
+                tr.cells[1].innerHTML = `<strong>${nom}</strong><br><small>${mail}</small>`;
+                tr.cells[2].innerHTML = `<span class="badge bg-info text-dark">${mot}</span>`;
             }
             bootstrap.Modal.getInstance(document.getElementById('modalPaciente')).hide();
         }
