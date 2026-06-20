@@ -2,67 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>DentalSys - Inicio de Sesión</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9eff1; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-container { background: #ffffff; width: 380px; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid #007bff; }
-        .logo { text-align: center; font-size: 24px; font-weight: bold; color: #333; margin-bottom: 30px; }
-        .logo span { color: #007bff; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 600; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        button { width: 100%; padding: 14px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        button:hover { background-color: #0056b3; }
-        #mensaje { margin-top: 25px; padding: 15px; border-radius: 6px; text-align: center; font-weight: bold; display: none; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    </style>
+    <title>Login - Consultorio Dental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-
-    <div class="login-container">
-        <div class="logo">Dental<span>Sys</span><br><span style="font-size: 12px; color: #888;">Control de Accesos</span></div>
-        
-        <div class="form-group">
-            <label for="correo">Correo Electrónico</label>
-            <input type="email" id="correo" placeholder="usuario@dentalsys.com">
-        </div>
-        
-        <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" placeholder="••••••••">
-        </div>
-        
-        <button onclick="autenticar()" id="btn-login">Ingresar al Sistema</button>
-        
-        <div id="mensaje"></div>
+<body class="bg-light d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="card p-4 shadow" style="width: 350px;">
+        <h3 class="text-center">Iniciar Sesión</h3>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label>Correo Electrónico</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
     </div>
 
     <script>
-        function autenticar() {
-            var email = document.getElementById("correo").value;
-            var pass = document.getElementById("password").value;
-            var msg = document.getElementById("mensaje");
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let email = document.getElementById('email').value;
             
-            msg.style.display = "block";
-            
-            // Lógica de ruteo multi-rol por credenciales
-            if(email === "doctora@dentalsys.com" && pass === "DocDental2026*") {
-                msg.className = "success";
-                msg.innerHTML = "¡Acceso Autorizado! Entrando como Doctora...";
-                setTimeout(function(){ window.location.href = "dashboard_doctora.html"; }, 1000);
-            } 
-            else if(email === "asistente@dentalsys.com" && pass === "AsisDental2026*") {
-                msg.className = "success";
-                msg.innerHTML = "¡Acceso Autorizado! Entrando como Asistente...";
-                setTimeout(function(){ window.location.href = "dashboard_asistente.html"; }, 1000);
-            } 
-            else {
-                msg.className = "error";
-                msg.innerHTML = "Error de SQA: Credenciales incorrectas.";
+            // Lógica de redirección:
+            if(email === "doctora@dentalsys.com") {
+                window.location.href = "dashboard_doctora.html";
+            } else if(email === "asistente@dentalsys.com") {
+                window.location.href = "dashboard_asistente.html";
+            } else {
+                alert("Usuario no reconocido");
             }
-        }
+        });
     </script>
-
 </body>
 </html>

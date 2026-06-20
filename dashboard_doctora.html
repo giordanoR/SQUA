@@ -11,11 +11,13 @@
         body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .sidebar { min-height: 100vh; background-color: var(--primary-dark); color: white; width: 280px; transition: all 0.3s; }
         .sidebar h4 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
-        .sidebar a { color: var(--accent-cyan); text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 5px 10px; transition: 0.2s; }
+        .sidebar a { color: var(--accent-cyan); text-decoration: none; padding: 12px 20px; display: block; border-radius: 8px; margin: 5px 10px; transition: 0.2s; cursor: pointer; }
         .sidebar a:hover, .sidebar a.active { background-color: var(--secondary-blue); color: white; transform: translateX(5px); }
         .card-stats { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary-blue); }
-        .status-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 20px; }
         .btn-action { padding: 5px 10px; font-size: 0.85rem; }
+        /* Ocultar secciones por defecto */
+        .seccion-modulo { display: none; }
+        .seccion-activa { display: block; }
     </style>
 </head>
 <body>
@@ -24,14 +26,10 @@
             <div class="p-4">
                 <h4 class="text-center"><i class="fas fa-user-md"></i> Portal Médico</h4>
             </div>
-            <a href="#" class="active"><i class="fas fa-home me-2"></i> Resumen General</a>
-            <a href="#"><i class="fas fa-calendar-check me-2"></i> Gestión de Citas <span class="badge bg-danger rounded-pill float-end">3</span></a>
-            <a href="#"><i class="fas fa-clock me-2"></i> Definir Mi Horario</a>
-            <a href="#"><i class="fas fa-users me-2"></i> Base de Pacientes</a>
-            <a href="#"><i class="fas fa-file-medical me-2"></i> Historias Clínicas</a>
-            <a href="#"><i class="fas fa-tooth me-2"></i> Odontogramas Pro</a>
-            <a href="#"><i class="fas fa-chart-line me-2"></i> Reportes de Producción</a>
-            <a href="#"><i class="fas fa-cog me-2"></i> Configuración</a>
+            <a onclick="cambiarModulo('resumen', this)" class="menu-link active"><i class="fas fa-home me-2"></i> Resumen General</a>
+            <a onclick="cambiarModulo('citas', this)" class="menu-link"><i class="fas fa-calendar-check me-2"></i> Gestión de Citas <span id="contador-citas" class="badge bg-danger rounded-pill float-end">2</span></a>
+            <a onclick="cambiarModulo('horarios', this)" class="menu-link"><i class="fas fa-clock me-2"></i> Definir Mi Horario</a>
+            <a onclick="alert('Módulo de Historias Clínicas en construcción')" class="menu-link"><i class="fas fa-file-medical me-2"></i> Historias Clínicas</a>
             <div class="mt-5 p-3">
                 <a href="login_dentista.html" class="text-white bg-danger text-center"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a>
             </div>
@@ -40,102 +38,87 @@
         <div class="flex-grow-1 p-4">
             <header class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="fw-bold mb-0">Bienvenida, Dra. Rojas</h2>
-                    <p class="text-muted small">Control total del Consultorio Odontológico</p>
+                    <h2 class="fw-bold mb-0" id="titulo-pantalla">Resumen General</h2>
+                    <p class="text-muted small">Panel de control de la Doctora Rojas</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" onclick="alert('Enlace de horario copiado para enviar al paciente')">
-                        <i class="fas fa-share-alt"></i> Enviar Mi Horario
-                    </button>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegistro">
-                        <i class="fas fa-plus"></i> Registrar Paciente/Cita
+                        <i class="fas fa-plus"></i> Registrar Nuevo Paciente
                     </button>
                 </div>
             </header>
 
-            <div class="card card-stats p-4 mb-4">
-                <h5 class="mb-4 text-primary"><i class="fas fa-bell me-2"></i> Solicitudes del Asistente (Pendientes de Aprobación)</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>CI</th>
-                                <th>Paciente</th>
-                                <th>Motivo Propuesto</th>
-                                <th>Hora Sugerida</th>
-                                <th>Acciones Médicas</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1029384-LP</td>
-                                <td><strong>Marcos Benítez</strong><br><small class="text-muted">marcos@email.com</small></td>
-                                <td><select class="form-select form-select-sm" id="motivo1">
-                                    <option value="Limpieza">Limpieza Dental</option>
-                                    <option value="Revision" selected>Revisión General</option>
-                                    <option value="Extraccion">Extracción</option>
-                                    <option value="Lavacion">Lavación Profunda</option>
-                                </select></td>
-                                <td>14:30</td>
-                                <td>
-                                    <button class="btn btn-success btn-action" title="Aceptar Cita"><i class="fas fa-check"></i></button>
-                                    <button class="btn btn-warning btn-action" title="Cambiar Horario"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-danger btn-action" title="Rechazar"><i class="fas fa-times"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>8827361-SC</td>
-                                <td><strong>Elena Vizcarra</strong><br><small class="text-muted">elena.v@email.com</small></td>
-                                <td><select class="form-select form-select-sm" id="motivo2">
-                                    <option value="Limpieza">Limpieza Dental</option>
-                                    <option value="Revision">Revisión General</option>
-                                    <option value="Extraccion" selected>Extracción</option>
-                                    <option value="Lavacion">Lavación Profunda</option>
-                                </select></td>
-                                <td>16:00</td>
-                                <td>
-                                    <button class="btn btn-success btn-action"><i class="fas fa-check"></i> Aprobar</button>
-                                    <button class="btn btn-danger btn-action"><i class="fas fa-times"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card card-stats p-4 h-100">
-                        <h5 class="text-primary mb-3"><i class="fas fa-clock me-2"></i> Mi Disponibilidad de Hoy</h5>
-                        <div class="list-group">
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                08:00 - 12:00 (Mañana)
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" checked>
+            <div id="modulo-resumen" class="seccion-modulo seccion-activa">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-stats p-4 h-100">
+                            <h5 class="text-primary mb-3"><i class="fas fa-clock me-2"></i> Mi Disponibilidad de Hoy</h5>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    08:00 - 12:00 (Mañana)
+                                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" checked></div>
                                 </div>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center text-muted">
-                                12:00 - 14:00 (Almuerzo/Cerrado)
-                                <span class="badge bg-secondary">Inactivo</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
-                                14:00 - 18:00 (Tarde)
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" checked>
+                                <div class="list-group-item d-flex justify-content-between align-items-center text-muted">
+                                    12:00 - 14:00 (Almuerzo)
+                                    <span class="badge bg-secondary">Cerrado</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    14:00 - 18:00 (Tarde)
+                                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox" checked></div>
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-secondary mt-3">Editar Horarios Semanales</button>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card card-stats p-4 h-100">
-                        <h5 class="text-primary mb-3"><i class="fas fa-chart-pie me-2"></i> Resumen de Tratamientos</h5>
-                        <canvas id="myChart" style="max-height: 150px;"></canvas>
-                        <p class="small text-muted mt-2 text-center">La mayoría de citas hoy son por <strong>Extracciones</strong>.</p>
+                    <div class="col-md-6">
+                        <div class="card card-stats p-4 h-100 bg-light border-0">
+                            <h3 class="text-center text-secondary mt-4"><i class="fas fa-tooth fa-3x mb-3 text-primary"></i><br>Consultorio Activo</h3>
+                            <p class="text-center mt-2">Navega a "Gestión de Citas" para ver los pacientes de hoy.</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div id="modulo-citas" class="seccion-modulo">
+                <div class="card card-stats p-4 mb-4">
+                    <h5 class="mb-4 text-primary"><i class="fas fa-users me-2"></i> Pacientes Agendados</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>CI</th>
+                                    <th>Paciente / Correo</th>
+                                    <th>Motivo de Consulta</th>
+                                    <th>Hora</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pacientes">
+                                <tr>
+                                    <td>1029384-LP</td>
+                                    <td><strong>Marcos Benítez</strong><br><small class="text-muted">marcos@email.com</small></td>
+                                    <td><span class="badge bg-info text-dark">Revisión General</span></td>
+                                    <td>14:30</td>
+                                    <td><span class="badge bg-warning text-dark">En Espera</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-action" onclick="this.parentElement.previousElementSibling.innerHTML='<span class=\'badge bg-success\'>Atendido</span>'"><i class="fas fa-check"></i> Atender</button>
+                                        <button class="btn btn-danger btn-action" onclick="this.closest('tr').remove()"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modulo-horarios" class="seccion-modulo">
+                <div class="card card-stats p-4 text-center">
+                    <h4 class="text-primary mt-3">Configuración de Horarios</h4>
+                    <p>Aquí la doctora puede bloquear días de vacaciones o modificar sus turnos.</p>
+                    <button class="btn btn-outline-primary mx-auto mt-3" style="width: 200px;"><i class="fas fa-save"></i> Guardar Cambios</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -143,53 +126,107 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Registrar Nuevo Paciente y Cita</h5>
+                    <h5 class="modal-title">Registrar Nuevo Paciente</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="formPaciente">
                         <div class="mb-3">
                             <label class="form-label">Cédula de Identidad (CI)</label>
-                            <input type="text" class="form-control" placeholder="Ej: 1234567 LP" id="reg-ci">
+                            <input type="text" class="form-control" id="reg-ci" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Nombre Completo del Paciente</label>
-                            <input type="text" class="form-control" placeholder="Ej: Juan Pérez" id="reg-nombre">
+                            <label class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="reg-nombre" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control" placeholder="ejemplo@correo.com" id="reg-correo">
+                            <input type="email" class="form-control" id="reg-correo" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Motivo de la Cita</label>
                             <select class="form-select" id="reg-motivo">
-                                <option value="Revision">Revisión General</option>
-                                <option value="Limpieza">Limpieza Dental</option>
-                                <option value="Extraccion">Extracción</option>
-                                <option value="Lavacion">Lavación Profunda</option>
-                                <option value="Endodoncia">Endodoncia</option>
+                                <option value="Revisión General">Revisión General</option>
+                                <option value="Limpieza Dental">Limpieza Dental</option>
+                                <option value="Extracción">Extracción</option>
+                                <option value="Lavación Profunda">Lavación Profunda</option>
                             </select>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="reg-fecha">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Hora</label>
-                                <input type="time" class="form-control" id="reg-hora">
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hora de la cita</label>
+                            <input type="time" class="form-control" id="reg-hora" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="alert('Paciente registrado con éxito')">Guardar y Aprobar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarPaciente()">Guardar y Registrar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // FUNCIÓN 1: Cambiar entre pantallas del menú
+        function cambiarModulo(moduloId, elementoMenu) {
+            // Ocultar todos los módulos
+            document.querySelectorAll('.seccion-modulo').forEach(el => el.classList.remove('seccion-activa'));
+            // Mostrar el módulo clickeado
+            document.getElementById('modulo-' + moduloId).classList.add('seccion-activa');
+            
+            // Cambiar el color del menú seleccionado
+            document.querySelectorAll('.menu-link').forEach(el => el.classList.remove('active'));
+            elementoMenu.classList.add('active');
+
+            // Cambiar el título arriba
+            document.getElementById('titulo-pantalla').innerText = elementoMenu.innerText;
+        }
+
+        // FUNCIÓN 2: Guardar los datos del formulario en la tabla
+        function guardarPaciente() {
+            // 1. Obtener los valores que escribió el usuario
+            let ci = document.getElementById("reg-ci").value;
+            let nombre = document.getElementById("reg-nombre").value;
+            let correo = document.getElementById("reg-correo").value;
+            let motivo = document.getElementById("reg-motivo").value;
+            let hora = document.getElementById("reg-hora").value;
+
+            // Validar que no estén vacíos
+            if(ci === "" || nombre === "" || hora === "") {
+                alert("Por favor, llena al menos el CI, Nombre y Hora.");
+                return;
+            }
+
+            // 2. Crear una nueva fila (<tr>) con esos datos
+            let nuevaFila = `
+                <tr>
+                    <td>${ci}</td>
+                    <td><strong>${nombre}</strong><br><small class="text-muted">${correo}</small></td>
+                    <td><span class="badge bg-primary">${motivo}</span></td>
+                    <td>${hora}</td>
+                    <td><span class="badge bg-success">Aprobado</span></td>
+                    <td>
+                        <button class="btn btn-success btn-action" onclick="this.parentElement.previousElementSibling.innerHTML='<span class=\\'badge bg-success\\'>Atendido</span>'"><i class="fas fa-check"></i> Atender</button>
+                        <button class="btn btn-danger btn-action" onclick="this.closest('tr').remove()"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>
+            `;
+
+            // 3. Insertar la fila en la tabla
+            document.getElementById("tabla-pacientes").innerHTML += nuevaFila;
+
+            // 4. Cerrar la ventanita (Modal)
+            let modalEl = document.getElementById('modalRegistro');
+            let modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide();
+
+            // 5. Limpiar el formulario para la próxima vez
+            document.getElementById("formPaciente").reset();
+
+            // 6. Si estábamos en otra pantalla, llevar a la doctora a ver la tabla
+            document.querySelectorAll('.menu-link')[1].click(); // Hace clic automático en "Gestión de Citas"
+        }
+    </script>
 </body>
 </html>
