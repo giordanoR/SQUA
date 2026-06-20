@@ -2,86 +2,187 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recepción - Consultorio Dental</title>
+    <title>Recepción Asistente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-nav: #2b3a4a; --action-green: #37b282; }
+        :root { --primary-nav: #2b3a4a; --action-green: #20c997; }
         body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
         .sidebar { min-height: 100vh; background-color: var(--primary-nav); color: white; width: 260px; }
         .sidebar h3 { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; text-align: center; margin-top: 15px;}
-        .sidebar a { color: #a9b7c6; text-decoration: none; padding: 15px 20px; display: block; font-size: 1.1rem; transition: 0.2s; cursor: pointer;}
-        .sidebar a:hover, .sidebar a.active { background-color: var(--action-green); color: white; }
-        .sidebar a i { width: 25px; text-align: center; }
-        .seccion-modulo { display: none; }
+        .sidebar a { color: #a9b7c6; text-decoration: none; padding: 15px 20px; display: block; font-size: 1.1rem; cursor: pointer; transition: 0.3s;}
+        .sidebar a:hover, .sidebar a.active { background-color: var(--action-green); color: white; border-radius: 0 25px 25px 0; margin-right: 15px; }
+        .seccion-modulo { display: none; animation: slideIn 0.3s ease-out; }
         .seccion-activa { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+        
+        /* Ocultar elementos que no deben salir en la factura impresa */
+        @media print {
+            .sidebar, .no-print { display: none !important; }
+            .flex-grow-1 { padding: 0 !important; margin: 0 !important; }
+            .card { border: none !important; box-shadow: none !important; }
+        }
     </style>
 </head>
 <body>
     <div class="d-flex">
         <nav class="sidebar shadow">
-            <h3><i class="fas fa-tooth"></i> Recepción</h3>
-            <a onclick="cambiarModulo('inicio', this)" class="active"><i class="fas fa-chart-bar"></i> Inicio General</a>
-            <a onclick="cambiarModulo('registrar', this)"><i class="fas fa-plus"></i> Registrar Paciente</a>
-            <a onclick="cambiarModulo('buscar', this)"><i class="fas fa-search"></i> Buscar Paciente</a>
-            <a onclick="cambiarModulo('agenda', this)"><i class="fas fa-calendar-alt"></i> Agenda y Horarios</a>
-            <a onclick="cambiarModulo('pagos', this)"><i class="fas fa-credit-card"></i> Pagos y Facturación</a>
+            <h3><i class="fas fa-tooth text-info"></i> DentSys Recepción</h3>
+            <a onclick="cambiarModulo('inicio', this)" class="active mt-3"><i class="fas fa-user-plus fa-fw"></i> Ingreso a Sala</a>
+            <a onclick="cambiarModulo('buscar', this)"><i class="fas fa-search fa-fw"></i> Buscar Paciente</a>
+            <a onclick="cambiarModulo('agenda', this)"><i class="fas fa-calendar-alt fa-fw"></i> Agenda de Turnos</a>
+            <a onclick="cambiarModulo('pagos', this)"><i class="fas fa-file-invoice-dollar fa-fw"></i> Facturación y Cobros</a>
             <div class="mt-5 border-top border-secondary pt-3">
-                <a href="login_dentista.html" class="text-danger"><i class="fas fa-door-open"></i> Cerrar Sesión</a>
+                <a href="login_dentista.html" class="text-danger ps-4 hover-danger"><i class="fas fa-power-off fa-fw"></i> Cerrar Sesión</a>
             </div>
         </nav>
 
         <div class="flex-grow-1 p-5">
-            <h2 id="rol-header" class="fw-bold mb-4" style="color: var(--primary-nav);">Panel de Control de Asistencia</h2>
+            <h2 id="rol-header" class="fw-bold mb-4 no-print" style="color: var(--primary-nav);">Panel de Control de Asistencia</h2>
 
             <div id="modulo-inicio" class="seccion-modulo seccion-activa">
-                <div class="alert alert-info"><strong>¡Buen día!</strong> Sistema de recepción en línea.</div>
-                <div class="card p-4 shadow-sm border-0 mt-4">
-                    <h5>Pacientes en Sala de Espera Actal</h5>
-                    <table class="table table-striped align-middle mt-3">
-                        <thead class="table-dark"><tr><th>CI</th><th>Nombre</th><th>Motivo</th><th>Acción</th></tr></thead>
-                        <tbody id="tabla-recepcion">
-                            <tr><td>882910</td><td>Lucía Fernández</td><td>Revisión</td><td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-times"></i> Retirar</button></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="modulo-registrar" class="seccion-modulo">
-                <div class="card p-4 shadow-sm border-0">
-                    <h5 class="mb-4">Admisión de Nuevo Paciente</h5>
-                    <form id="formAsistente">
-                        <div class="row">
-                            <div class="col-md-6 mb-3"><label>Nombres Completos</label><input type="text" id="asis-nom" class="form-control" required></div>
-                            <div class="col-md-6 mb-3"><label>Carnet de Identidad (CI)</label><input type="text" id="asis-ci" class="form-control" required></div>
-                            <div class="col-md-6 mb-3"><label>Teléfono de Contacto</label><input type="text" class="form-control"></div>
-                            <div class="col-md-6 mb-3"><label>Motivo de Consulta</label><select id="asis-mot" class="form-select"><option>Revisión General</option><option>Limpieza</option><option>Extracción</option></select></div>
+                <div id="alerta-exito" class="alert alert-success d-none shadow-sm"><i class="fas fa-check-circle"></i> Paciente derivado a sala de espera exitosamente.</div>
+                
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card p-4 shadow-sm border-0 rounded-4 border-top border-success border-4">
+                            <h5 class="mb-4"><i class="fas fa-clipboard-list text-success"></i> Nuevo Ingreso</h5>
+                            <form id="formAsistente">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="asis-ci" placeholder="CI" required>
+                                    <label for="asis-ci">Cédula de Identidad</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="asis-nom" placeholder="Nombre" required>
+                                    <label for="asis-nom">Nombre Completo</label>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted">Motivo de Visita</label>
+                                    <select id="asis-mot" class="form-select form-select-lg">
+                                        <option>Revisión de Rutina</option>
+                                        <option>Limpieza Profunda</option>
+                                        <option class="text-danger fw-bold">Emergencia / Dolor Agudo</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-lg text-white w-100 shadow-sm" style="background-color: var(--action-green);" onclick="registrarEnRecepcion()"><i class="fas fa-share-square"></i> Enviar a Sala de Espera</button>
+                            </form>
                         </div>
-                        <button type="button" class="btn text-white w-100 mt-2" style="background-color: var(--action-green);" onclick="registrarEnRecepcion()">Completar Registro y Enviar a Sala</button>
-                    </form>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card p-4 shadow-sm border-0 rounded-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5><i class="fas fa-users text-primary"></i> Sala de Espera Actual</h5>
+                                <span class="badge bg-primary rounded-pill px-3 py-2" id="contador-sala">1 Paciente(s)</span>
+                            </div>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>Cédula</th><th>Paciente</th><th>Motivo</th><th>Acción</th></tr></thead>
+                                <tbody id="tabla-recepcion">
+                                    <tr><td>882910</td><td><strong>Lucía Fernández</strong></td><td><span class="badge bg-secondary rounded-pill">Revisión de Rutina</span></td><td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove(); actualizarContador();"><i class="fas fa-sign-out-alt"></i> Retirar</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div id="modulo-buscar" class="seccion-modulo"><div class="card p-4 shadow-sm border-0"><h5>Buscador en Recepción</h5><div class="input-group mt-3"><input type="text" class="form-control" placeholder="Buscar por nombre o CI..."><button class="btn btn-secondary">Buscar</button></div></div></div>
-            <div id="modulo-agenda" class="seccion-modulo"><div class="card p-4 text-center shadow-sm border-0"><i class="fas fa-calendar-check fa-3x text-secondary mb-3"></i><h4>Calendario de Citas</h4><p>Visualización del calendario interactivo habilitado.</p></div></div>
-            <div id="modulo-pagos" class="seccion-modulo"><div class="card p-4 shadow-sm border-0"><h5>Generar Recibo / Factura</h5><div class="mb-3 mt-3"><label>Paciente</label><input type="text" class="form-control" placeholder="Nombre del paciente"></div><div class="mb-3"><label>Monto a cobrar (Bs.)</label><input type="number" class="form-control" placeholder="0.00"></div><button class="btn btn-primary"><i class="fas fa-print"></i> Imprimir Recibo</button></div></div>
+            <div id="modulo-buscar" class="seccion-modulo">
+                <div class="card p-5 shadow-sm border-0 rounded-4 text-center">
+                    <h4 class="mb-4 text-secondary">Base de Datos de Recepción</h4>
+                    <div class="input-group input-group-lg w-75 mx-auto">
+                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" class="form-control" placeholder="Buscar por CI, Nombre o Teléfono...">
+                        <button class="btn btn-primary px-4">Buscar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modulo-agenda" class="seccion-modulo">
+                <div class="card p-4 shadow-sm border-0 rounded-4">
+                    <h5 class="mb-4"><i class="fas fa-calendar-alt text-info"></i> Agenda de la Doctora - Hoy</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="far fa-clock me-2"></i> 09:30 AM</span> <strong>Carlos Méndez</strong> <span class="badge bg-success">Confirmado</span></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="far fa-clock me-2"></i> 10:15 AM</span> <strong>Ana Torres</strong> <span class="badge bg-warning text-dark">Por Confirmar</span></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"><span><i class="far fa-clock me-2"></i> 11:00 AM</span> <strong>Bloqueo</strong> <span class="badge bg-secondary">Reunión Interna</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="modulo-pagos" class="seccion-modulo">
+                <div class="card p-5 shadow-sm border-0 rounded-4" id="factura-area">
+                    <div class="d-flex justify-content-between border-bottom pb-3 mb-4">
+                        <h3 class="fw-bold text-primary"><i class="fas fa-tooth"></i> DentalSys</h3>
+                        <div class="text-end text-muted">
+                            <h5>FACTURA / RECIBO</h5>
+                            <small>Nº: <script>document.write(Math.floor(Math.random() * 10000));</script></small><br>
+                            <small>Fecha: <script>document.write(new Date().toLocaleDateString());</script></small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4 no-print">
+                        <div class="col-md-6"><label>Paciente a facturar:</label><input type="text" class="form-control" id="fac-nom" placeholder="Nombre completo..."></div>
+                        <div class="col-md-6"><label>Monto a cobrar (Bs.):</label><input type="number" class="form-control" id="fac-monto" placeholder="0.00"></div>
+                    </div>
+
+                    <div class="bg-light p-4 rounded text-center mb-4">
+                        <h4 class="text-secondary mb-1">Total a Pagar</h4>
+                        <h1 class="text-success fw-bold">Bs. <span id="display-monto">0.00</span></h1>
+                    </div>
+
+                    <div class="text-center no-print mt-4">
+                        <button class="btn btn-primary btn-lg px-5 shadow" onclick="generarImpresion()"><i class="fas fa-print me-2"></i> Imprimir Factura Oficial</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Lógica de menús
         function cambiarModulo(id, el) {
             document.querySelectorAll('.seccion-modulo').forEach(s => s.classList.remove('seccion-activa'));
             document.getElementById('modulo-'+id).classList.add('seccion-activa');
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             el.classList.add('active');
         }
+        
+        // Lógica de registrar paciente
         function registrarEnRecepcion() {
-            let ci = document.getElementById('asis-ci').value, nom = document.getElementById('asis-nom').value, mot = document.getElementById('asis-mot').value;
-            if(ci === "" || nom === "") return alert("Por favor llena el CI y el Nombre");
-            document.getElementById('tabla-recepcion').innerHTML += `<tr><td>${ci}</td><td>${nom}</td><td>${mot}</td><td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-times"></i> Retirar</button></td></tr>`;
+            let ci = document.getElementById('asis-ci').value;
+            let nom = document.getElementById('asis-nom').value;
+            let mot = document.getElementById('asis-mot').value;
+            let motClass = mot.includes('Emergencia') ? 'bg-danger' : 'bg-secondary';
+            
+            if(ci === "" || nom === "") {
+                alert("Por favor llena la Cédula y el Nombre.");
+                return;
+            }
+            
+            document.getElementById('tabla-recepcion').innerHTML += `<tr><td>${ci}</td><td><strong>${nom}</strong></td><td><span class="badge ${motClass} rounded-pill">${mot}</span></td><td><button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove(); actualizarContador();"><i class="fas fa-sign-out-alt"></i> Retirar</button></td></tr>`;
+            
             document.getElementById('formAsistente').reset();
-            alert("Paciente registrado con éxito. Puede verlo en la pestaña Inicio General.");
+            actualizarContador();
+            
+            // Mostrar alerta de éxito
+            let alerta = document.getElementById('alerta-exito');
+            alerta.classList.remove('d-none');
+            setTimeout(() => alerta.classList.add('d-none'), 3000);
+        }
+
+        function actualizarContador() {
+            let filas = document.getElementById('tabla-recepcion').getElementsByTagName('tr').length;
+            document.getElementById('contador-sala').innerText = filas + " Paciente(s)";
+        }
+
+        // Lógica de impresión de factura
+        function generarImpresion() {
+            let monto = document.getElementById('fac-monto').value;
+            let nom = document.getElementById('fac-nom').value;
+            if(!nom || !monto) { alert("Completa el nombre y el monto antes de imprimir."); return; }
+            
+            document.getElementById('display-monto').innerText = monto;
+            
+            // Abre el cuadro de diálogo de impresión nativo del navegador
+            window.print();
         }
     </script>
 </body>
