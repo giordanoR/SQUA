@@ -74,3 +74,10 @@ class TestLoginMultiRol(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    
+    # ... (al final de tus pruebas)
+    def tearDown(self):
+        # Este comando hará que el navegador NO se cierre 
+        # hasta que tú presiones ENTER en la terminal de VS Code
+        input("\n🔥 Pruebas terminadas. Presiona ENTER en la terminal para cerrar el navegador...")
+        self.driver.quit()
