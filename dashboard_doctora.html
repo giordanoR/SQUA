@@ -25,20 +25,17 @@
             <a onclick="cambiarModulo('resumen', this)" class="active"><i class="fas fa-home me-2"></i> Resumen General</a>
             <a onclick="cambiarModulo('pacientes', this)"><i class="fas fa-calendar-check me-2"></i> Gestión de Pacientes <span class="badge bg-danger rounded-pill float-end">3</span></a>
             <a onclick="cambiarModulo('horarios', this)"><i class="fas fa-clock me-2"></i> Definir Mi Horario</a>
-            <a onclick="alert('Accediendo a Historias...')"><i class="fas fa-file-medical me-2"></i> Historias Clínicas</a>
-            <a onclick="alert('Cargando Odontograma...')"><i class="fas fa-tooth me-2"></i> Odontogramas Pro</a>
-            <a onclick="alert('Generando Reportes...')"><i class="fas fa-chart-line me-2"></i> Reportes de Producción</a>
-            <a onclick="alert('Configuración...')"><i class="fas fa-cog me-2"></i> Configuración</a>
-            <div class="mt-5 p-2">
+            <a onclick="cambiarModulo('historias', this)"><i class="fas fa-file-medical me-2"></i> Historias Clínicas</a>
+            <a onclick="cambiarModulo('odontograma', this)"><i class="fas fa-tooth me-2"></i> Odontogramas Pro</a>
+            <a onclick="cambiarModulo('reportes', this)"><i class="fas fa-chart-line me-2"></i> Reportes de Producción</a>
+            <a onclick="cambiarModulo('config', this)"><i class="fas fa-cog me-2"></i> Configuración</a>
+            <div class="mt-5 p-2 border-top">
                 <a href="login_dentista.html" class="text-white bg-danger text-center"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
         </nav>
 
         <div class="flex-grow-1 p-4">
-            <header class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="fw-bold text-primary" id="titulo-pantalla">Resumen General</h2>
-                <button class="btn btn-primary" onclick="abrirModalNuevo()"><i class="fas fa-plus"></i> Nuevo Registro</button>
-            </header>
+            <h2 id="rol-header" class="fw-bold text-primary mb-4">Panel de la Doctora Rojas</h2>
 
             <div id="modulo-resumen" class="seccion-modulo seccion-activa">
                 <div class="row g-3">
@@ -48,22 +45,18 @@
                 </div>
                 <div class="card mt-4 p-4 border-0 shadow-sm">
                     <h5><i class="fas fa-info-circle"></i> Estado del Consultorio</h5>
-                    <p>Todos los sistemas están operativos. El asistente ha enviado 3 nuevas solicitudes.</p>
+                    <p>Todos los sistemas operativos. El asistente ha enviado nuevas solicitudes de pacientes.</p>
                 </div>
             </div>
 
             <div id="modulo-pacientes" class="seccion-modulo">
                 <div class="card card-stats p-4 bg-white border-0 shadow">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>Control y Edición de Pacientes</h5>
+                        <button class="btn btn-primary" onclick="abrirModalNuevo()"><i class="fas fa-plus"></i> Registrar Cita Manual</button>
+                    </div>
                     <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>CI</th>
-                                <th>Nombre / Correo</th>
-                                <th>Motivo</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+                        <thead class="table-light"><tr><th>CI</th><th>Nombre / Correo</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
                         <tbody id="tabla-pacientes">
                             <tr id="fila-1">
                                 <td>1029384-LP</td>
@@ -71,8 +64,8 @@
                                 <td><span class="badge bg-info text-dark">Limpieza Dental</span></td>
                                 <td><span class="badge bg-warning">En Espera</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('1', '1029384-LP', 'Marcos Benítez', 'marcos@email.com', 'Limpieza Dental')"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-outline-success" onclick="atender(this)"><i class="fas fa-check"></i></button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('1', '1029384-LP', 'Marcos Benítez', 'marcos@email.com', 'Limpieza Dental')"><i class="fas fa-edit"></i> Editar</button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="atender(this)"><i class="fas fa-check"></i> Atender</button>
                                     <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
@@ -81,45 +74,27 @@
                 </div>
             </div>
 
-            <div id="modulo-horarios" class="seccion-modulo">
-                <div class="card p-5 text-center shadow-sm border-0">
-                    <i class="fas fa-clock fa-4x text-primary mb-3"></i>
-                    <h4>Definición de Horarios</h4>
-                    <p>Seleccione sus turnos disponibles para que el asistente pueda agendar.</p>
-                </div>
-            </div>
+            <div id="modulo-horarios" class="seccion-modulo"><div class="card p-5 text-center shadow-sm border-0"><i class="fas fa-clock fa-4x text-primary mb-3"></i><h4>Definición de Horarios</h4><p>Lunes a Viernes: 08:00 a 18:00 (Habilitado)</p></div></div>
+            <div id="modulo-historias" class="seccion-modulo"><div class="card p-5 shadow-sm border-0"><h4>Buscador de Historias Clínicas</h4><input type="text" class="form-control mb-3" placeholder="Ingrese CI del paciente..."><button class="btn btn-primary">Buscar Expediente</button></div></div>
+            <div id="modulo-odontograma" class="seccion-modulo"><div class="card p-5 text-center shadow-sm border-0"><i class="fas fa-tooth fa-4x text-info mb-3"></i><h4>Módulo de Odontograma Digital</h4><p>Herramienta gráfica para marcado de piezas dentales habilitada.</p></div></div>
+            <div id="modulo-reportes" class="seccion-modulo"><div class="card p-5 shadow-sm border-0"><h4>Reportes Mensuales</h4><p>Total de ingresos: Bs. 4,500. Crecimiento del 12%.</p><button class="btn btn-success"><i class="fas fa-file-excel"></i> Exportar</button></div></div>
+            <div id="modulo-config" class="seccion-modulo"><div class="card p-5 shadow-sm border-0"><h4>Configuración del Sistema</h4><p>Ajustes de perfil y contraseñas.</p></div></div>
         </div>
     </div>
 
     <div class="modal fade" id="modalPaciente" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="modalTitulo">Registrar Paciente</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formDoc">
-                        <input type="hidden" id="edit-id">
-                        <div class="mb-3"><label class="form-label">Cédula (CI)</label><input type="text" id="reg-ci" class="form-control" required></div>
-                        <div class="mb-3"><label class="form-label">Nombre Completo</label><input type="text" id="reg-nombre" class="form-control" required></div>
-                        <div class="mb-3"><label class="form-label">Correo</label><input type="email" id="reg-correo" class="form-control"></div>
-                        <div class="mb-3">
-                            <label class="form-label">Motivo de la Cita</label>
-                            <select id="reg-motivo" class="form-select">
-                                <option>Revisión General</option>
-                                <option>Limpieza Dental</option>
-                                <option>Extracción</option>
-                                <option>Lavación Profunda</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary w-100" onclick="guardarPaciente()">Guardar Cambios</button>
-                </div>
+        <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-header bg-primary text-white"><h5 class="modal-title" id="modalTitulo">Registrar</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="formDoc"><input type="hidden" id="edit-id">
+                    <div class="mb-3"><label class="form-label">Cédula (CI)</label><input type="text" id="reg-ci" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Nombre Completo</label><input type="text" id="reg-nombre" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Correo</label><input type="email" id="reg-correo" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label">Motivo</label><select id="reg-motivo" class="form-select"><option>Revisión General</option><option>Limpieza Dental</option><option>Extracción</option><option>Ortodoncia</option></select></div>
+                </form>
             </div>
-        </div>
+            <div class="modal-footer"><button class="btn btn-primary w-100" onclick="guardarPaciente()">Guardar Cambios</button></div>
+        </div></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -129,47 +104,17 @@
             document.getElementById('modulo-'+id).classList.add('seccion-activa');
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('titulo-pantalla').innerText = el.innerText;
         }
-
-        function abrirModalNuevo() {
-            document.getElementById('formDoc').reset();
-            document.getElementById('edit-id').value = "";
-            document.getElementById('modalTitulo').innerText = "Nuevo Registro";
-            new bootstrap.Modal(document.getElementById('modalPaciente')).show();
-        }
-
-        function editarPaciente(id, ci, nom, mail, mot) {
-            document.getElementById('edit-id').value = id;
-            document.getElementById('reg-ci').value = ci;
-            document.getElementById('reg-nombre').value = nom;
-            document.getElementById('reg-correo').value = mail;
-            document.getElementById('reg-motivo').value = mot;
-            document.getElementById('modalTitulo').innerText = "Modificar Paciente";
-            new bootstrap.Modal(document.getElementById('modalPaciente')).show();
-        }
-
-        function atender(btn) {
-            btn.closest('tr').querySelector('.badge.bg-warning').className = "badge bg-success";
-            btn.closest('tr').querySelector('.badge.bg-success').innerText = "Atendido";
-        }
-
+        function abrirModalNuevo() { document.getElementById('formDoc').reset(); document.getElementById('edit-id').value = ""; document.getElementById('modalTitulo').innerText = "Nuevo Registro"; new bootstrap.Modal(document.getElementById('modalPaciente')).show(); }
+        function editarPaciente(id, ci, nom, mail, mot) { document.getElementById('edit-id').value = id; document.getElementById('reg-ci').value = ci; document.getElementById('reg-nombre').value = nom; document.getElementById('reg-correo').value = mail; document.getElementById('reg-motivo').value = mot; document.getElementById('modalTitulo').innerText = "Modificar Paciente"; new bootstrap.Modal(document.getElementById('modalPaciente')).show(); }
+        function atender(btn) { btn.closest('tr').querySelector('.badge.bg-warning').className = "badge bg-success"; btn.closest('tr').querySelector('.badge.bg-success').innerText = "Atendido"; }
         function guardarPaciente() {
-            let id = document.getElementById('edit-id').value;
-            let ci = document.getElementById('reg-ci').value;
-            let nom = document.getElementById('reg-nombre').value;
-            let mail = document.getElementById('reg-correo').value;
-            let mot = document.getElementById('reg-motivo').value;
-
-            if(id === "") { // NUEVO
-                let newId = Date.now();
-                let fila = `<tr id="fila-${newId}"><td>${ci}</td><td><strong>${nom}</strong><br><small>${mail}</small></td><td><span class="badge bg-info text-dark">${mot}</span></td><td><span class="badge bg-warning">Espera</span></td><td><button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('${newId}','${ci}','${nom}','${mail}','${mot}')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td></tr>`;
-                document.getElementById('tabla-pacientes').innerHTML += fila;
-            } else { // EDITAR
-                let tr = document.getElementById('fila-'+id);
-                tr.cells[0].innerText = ci;
-                tr.cells[1].innerHTML = `<strong>${nom}</strong><br><small>${mail}</small>`;
-                tr.cells[2].innerHTML = `<span class="badge bg-info text-dark">${mot}</span>`;
+            let id = document.getElementById('edit-id').value, ci = document.getElementById('reg-ci').value, nom = document.getElementById('reg-nombre').value, mail = document.getElementById('reg-correo').value, mot = document.getElementById('reg-motivo').value;
+            if(id === "") {
+                let nid = Date.now();
+                document.getElementById('tabla-pacientes').innerHTML += `<tr id="fila-${nid}"><td>${ci}</td><td><strong>${nom}</strong><br><small>${mail}</small></td><td><span class="badge bg-info text-dark">${mot}</span></td><td><span class="badge bg-warning">Espera</span></td><td><button class="btn btn-sm btn-outline-warning" onclick="editarPaciente('${nid}','${ci}','${nom}','${mail}','${mot}')"><i class="fas fa-edit"></i> Editar</button> <button class="btn btn-sm btn-outline-success" onclick="atender(this)"><i class="fas fa-check"></i> Atender</button> <button class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button></td></tr>`;
+            } else {
+                let tr = document.getElementById('fila-'+id); tr.cells[0].innerText = ci; tr.cells[1].innerHTML = `<strong>${nom}</strong><br><small>${mail}</small>`; tr.cells[2].innerHTML = `<span class="badge bg-info text-dark">${mot}</span>`;
             }
             bootstrap.Modal.getInstance(document.getElementById('modalPaciente')).hide();
         }
