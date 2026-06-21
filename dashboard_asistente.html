@@ -10,14 +10,16 @@
         body { background-color: var(--bg-app); font-family: 'Segoe UI', sans-serif; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23cbd5e1" fill-opacity="0.15"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); }
         .sidebar { min-height: 100vh; background-color: var(--primary-nav); color: white; width: 280px; box-shadow: 4px 0 15px rgba(0,0,0,0.08); }
         .sidebar h3 { padding: 25px 0; text-align: center; font-weight: 700; color: #f8fafc; margin: 0; background: rgba(0,0,0,0.1); }
-        .sidebar a { color: #94a3b8; text-decoration: none; padding: 16px 25px; display: block; font-size: 1.05rem; transition: all 0.3s; position: relative; }
+        .sidebar a { color: #94a3b8; text-decoration: none; padding: 16px 25px; display: block; font-size: 1.05rem; transition: all 0.3s; position: relative; cursor: pointer;}
         .sidebar a::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--action-green); transform: scaleY(0); transition: 0.3s; }
         .sidebar a:hover, .sidebar a.active { color: white; background: rgba(255,255,255,0.05); }
         .sidebar a:hover::before, .sidebar a.active::before { transform: scaleY(1); }
         .card { border-radius: 20px; border: none; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-        .search-bar-big { border-radius: 50px; padding: 20px 30px; font-size: 1.2rem; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .search-bar-big { border-radius: 50px; padding: 20px 30px; font-size: 1.2rem; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.05); outline: none; transition: 0.3s; }
+        .search-bar-big:focus { box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2); border: 1px solid var(--action-green); }
         .seccion-modulo { display: none; animation: slideInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .seccion-activa { display: block; }
+        .fila-busqueda { display: none; }
         @keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @media print { .sidebar, .no-print { display: none !important; } .flex-grow-1 { padding: 0 !important; } body { background: white; } }
     </style>
@@ -49,7 +51,7 @@
                             <form id="formAsistente">
                                 <div class="form-floating mb-3"><input type="text" class="form-control bg-light border-0" id="asis-ci" placeholder="CI" required><label>Cédula de Identidad</label></div>
                                 <div class="form-floating mb-3"><input type="text" class="form-control bg-light border-0" id="asis-nom" placeholder="Nombre" required><label>Nombre Completo</label></div>
-                                <div class="mb-4"><label class="form-label small text-muted fw-bold ms-1">TIPO DE ATENCIÓN</label><select id="asis-mot" class="form-select form-select-lg bg-light border-0"><option>Revisión de Rutina</option><option>Limpieza Profunda</option><option class="text-danger fw-bold">Emergencia Aguda</option></select></div>
+                                <div class="mb-4"><label class="form-label small text-muted fw-bold ms-1">TIPO DE ATENCIÓN</label><select id="asis-mot" class="form-select form-select-lg bg-light border-0"><option>Revisión de Rutina</option><option>Limpieza Profunda</option></select></div>
                                 <button type="button" class="btn btn-success btn-lg w-100 shadow-sm rounded-pill mt-2" onclick="registrarEnRecepcion()"><i class="fas fa-paper-plane me-2"></i> Enviar a Sala</button>
                             </form>
                         </div>
@@ -58,13 +60,12 @@
                         <div class="card p-4 h-100">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h5 class="fw-bold text-dark"><i class="fas fa-couch text-primary me-2"></i> Sala de Espera</h5>
-                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3 py-2" id="contador-sala"><i class="fas fa-users me-1"></i> 1 Paciente(s)</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3 py-2" id="contador-sala"><i class="fas fa-users me-1"></i> 0 Paciente(s)</span>
                             </div>
                             <div class="table-responsive">
                                 <table class="table align-middle table-borderless table-hover">
                                     <thead class="border-bottom border-2"><tr><th>CI</th><th>Paciente</th><th>Motivo</th><th>Acción</th></tr></thead>
                                     <tbody id="tabla-recepcion">
-                                        <tr class="border-bottom"><td class="text-muted">882910</td><td class="fw-bold">Lucía Fernández</td><td><span class="badge bg-secondary bg-opacity-25 text-secondary rounded-pill px-3">Revisión de Rutina</span></td><td><button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" style="width: 35px; height: 35px;" onclick="this.closest('tr').remove(); actualizarContador();"><i class="fas fa-times"></i></button></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -74,33 +75,101 @@
             </div>
 
             <div id="modulo-buscar" class="seccion-modulo">
-                <div class="text-center mt-5 pt-5">
+                <div class="text-center mt-4">
                     <i class="fas fa-folder-open fa-4x text-muted mb-4 opacity-50"></i>
                     <h3 class="fw-bold mb-4" style="color: var(--primary-nav);">Directorio de Pacientes</h3>
+                    
                     <div class="position-relative w-75 mx-auto">
-                        <input type="text" class="form-control search-bar-big" placeholder="Buscar por CI, Nombre, Apellido o Teléfono...">
+                        <input type="text" id="buscador-asis" class="form-control search-bar-big" placeholder="Buscar por CI, Nombre o Teléfono..." onkeyup="filtrarDirectorio()">
                         <button class="btn btn-primary rounded-circle position-absolute shadow" style="top: 10px; right: 12px; width: 45px; height: 45px;"><i class="fas fa-search"></i></button>
                     </div>
-                    <p class="text-muted mt-4">Presione Enter o haga clic en la lupa para buscar en la base de datos.</p>
+
+                    <div class="w-75 mx-auto mt-5">
+                        <div class="card shadow-sm border-0 d-none" id="contenedor-resultados">
+                            <table class="table table-hover align-middle mb-0 text-start">
+                                <thead class="table-light">
+                                    <tr><th>Cédula</th><th>Nombre del Paciente</th><th>Teléfono</th><th>Acción</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="fila-busqueda" data-info="7654321 carlos mendez 76543210">
+                                        <td>7654321</td><td><strong>Carlos Méndez</strong></td><td>76543210</td>
+                                        <td><button class="btn btn-sm btn-outline-success rounded-pill"><i class="fas fa-calendar-plus"></i> Agendar</button></td>
+                                    </tr>
+                                    <tr class="fila-busqueda" data-info="9876543 ana torres 65432109">
+                                        <td>9876543</td><td><strong>Ana Torres</strong></td><td>65432109</td>
+                                        <td><button class="btn btn-sm btn-outline-success rounded-pill"><i class="fas fa-calendar-plus"></i> Agendar</button></td>
+                                    </tr>
+                                    <tr class="fila-busqueda" data-info="1029384 marcos benitez 77112233">
+                                        <td>1029384</td><td><strong>Marcos Benítez</strong></td><td>77112233</td>
+                                        <td><button class="btn btn-sm btn-outline-success rounded-pill"><i class="fas fa-calendar-plus"></i> Agendar</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div id="no-resultados-asis" class="p-4 text-center text-muted d-none">
+                                <i class="fas fa-search-minus fa-2x mb-2"></i><br>Ningún paciente coincide con la búsqueda.
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <div id="modulo-pagos" class="seccion-modulo"><div class="card p-5 text-center"><i class="fas fa-file-invoice-dollar fa-3x text-success mb-3"></i><h4>Módulo de Facturación</h4><button class="btn btn-success mt-3 mx-auto" onclick="window.print()"><i class="fas fa-print me-2"></i> Imprimir Factura</button></div></div>
-            <div id="modulo-agenda" class="seccion-modulo"><div class="card p-5 text-center"><i class="fas fa-calendar-alt fa-3x text-info mb-3"></i><h4>Agenda de la Doctora</h4></div></div>
+            <div id="modulo-pagos" class="seccion-modulo"><div class="card p-5 text-center"><i class="fas fa-file-invoice-dollar fa-3x text-success mb-3"></i><h4>Facturación</h4><button class="btn btn-success mt-3 mx-auto" onclick="window.print()"><i class="fas fa-print me-2"></i> Imprimir</button></div></div>
+            <div id="modulo-agenda" class="seccion-modulo"><div class="card p-5 text-center"><i class="fas fa-calendar-alt fa-3x text-info mb-3"></i><h4>Agenda Diaria</h4></div></div>
         </div>
     </div>
 
     <script>
-        function cambiarModulo(id, el) { document.querySelectorAll('.seccion-modulo').forEach(s => s.classList.remove('seccion-activa')); document.getElementById('modulo-'+id).classList.add('seccion-activa'); document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active')); el.classList.add('active'); }
+        // Lógica para cambiar de módulos
+        function cambiarModulo(id, el) { 
+            document.querySelectorAll('.seccion-modulo').forEach(s => s.classList.remove('seccion-activa')); 
+            document.getElementById('modulo-'+id).classList.add('seccion-activa'); 
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active')); 
+            el.classList.add('active'); 
+        }
+
+        // Lógica de registro (Igual que antes)
         function registrarEnRecepcion() {
             let ci = document.getElementById('asis-ci').value, nom = document.getElementById('asis-nom').value, mot = document.getElementById('asis-mot').value;
-            let motClass = mot.includes('Emergencia') ? 'bg-danger bg-opacity-25 text-danger' : 'bg-secondary bg-opacity-25 text-secondary';
-            if(!ci || !nom) return alert("Cédula y Nombre son requeridos.");
-            document.getElementById('tabla-recepcion').innerHTML += `<tr class="border-bottom"><td class="text-muted">${ci}</td><td class="fw-bold">${nom}</td><td><span class="badge ${motClass} rounded-pill px-3">${mot}</span></td><td><button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" style="width: 35px; height: 35px;" onclick="this.closest('tr').remove(); actualizarContador();"><i class="fas fa-times"></i></button></td></tr>`;
+            if(!ci || !nom) return alert("Cédula y Nombre requeridos.");
+            document.getElementById('tabla-recepcion').innerHTML += `<tr class="border-bottom"><td class="text-muted">${ci}</td><td class="fw-bold">${nom}</td><td><span class="badge bg-secondary rounded-pill px-3">${mot}</span></td><td><button class="btn btn-sm btn-light text-danger rounded-circle" style="width: 35px; height: 35px;" onclick="this.closest('tr').remove(); actualizarContador();"><i class="fas fa-times"></i></button></td></tr>`;
             document.getElementById('formAsistente').reset(); actualizarContador();
             let alerta = document.getElementById('alerta-exito'); alerta.classList.remove('d-none'); setTimeout(() => alerta.classList.add('d-none'), 3000);
         }
         function actualizarContador() { document.getElementById('contador-sala').innerHTML = `<i class="fas fa-users me-1"></i> ${document.getElementById('tabla-recepcion').getElementsByTagName('tr').length} Paciente(s)`; }
+
+        // --- MOTOR DE BÚSQUEDA ASISTENTE ---
+        function filtrarDirectorio() {
+            let input = document.getElementById('buscador-asis').value.toLowerCase();
+            let contenedor = document.getElementById('contenedor-resultados');
+            let filas = document.querySelectorAll('.fila-busqueda');
+            let sinResultados = document.getElementById('no-resultados-asis');
+            let encontrados = 0;
+
+            // Mostrar el contenedor solo si hay texto
+            if(input.length > 0) {
+                contenedor.classList.remove('d-none');
+            } else {
+                contenedor.classList.add('d-none');
+                return;
+            }
+
+            filas.forEach(fila => {
+                let datos = fila.getAttribute('data-info').toLowerCase();
+                if (datos.includes(input)) {
+                    fila.style.display = "table-row";
+                    encontrados++;
+                } else {
+                    fila.style.display = "none";
+                }
+            });
+
+            if (encontrados === 0) {
+                sinResultados.classList.remove("d-none");
+            } else {
+                sinResultados.classList.add("d-none");
+            }
+        }
     </script>
 </body>
 </html>
